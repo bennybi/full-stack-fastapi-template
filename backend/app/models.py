@@ -6,6 +6,8 @@ from sqlmodel import Field, Relationship, SQLModel
 
 # Shared properties
 class UserBase(SQLModel):
+    username: str | None = Field(default=None, index=True, max_length=255)
+    nickname: str | None = Field(default=None, max_length=255)
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
@@ -75,6 +77,7 @@ class ItemUpdate(ItemBase):
 # Database model, database table inferred from class name
 class Item(ItemBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    title: str = Field(max_length=255)
     owner_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )

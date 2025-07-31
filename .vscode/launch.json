@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug FastAPI Project backend: Python Debugger",
+            "name": "Backend Server",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
@@ -18,11 +18,37 @@
             "envFile": "${workspaceFolder}/.env",
         },
         {
+            "name": "Launch Typer App",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/backend",
+            "program": "app/main_typer.py",
+            "args": [
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8000"
+            ],
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Frontend Server",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/frontend",
+            "command": "npm run dev",
+            "request": "launch"
+        },
+        {
+            "name": "Opener Browser against http://localhost:5173",
             "type": "chrome",
             "request": "launch",
-            "name": "Debug Frontend: Launch Chrome against http://localhost:5173",
             "url": "http://localhost:5173",
-            "webRoot": "${workspaceFolder}/frontend"
+            "webRoot": "${workspaceFolder}/frontend",
+            "runtimeArgs": [
+                "--do-not-de-elevate"
+            ],
         },
     ]
 }
