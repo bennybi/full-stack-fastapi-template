@@ -1,6 +1,7 @@
 import secrets
 import warnings
 from typing import Annotated, Any, Literal
+import logging
 
 from pydantic import (
     AnyUrl,
@@ -14,6 +15,58 @@ from pydantic import (
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
+
+LOGGING_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        "custom_formatter": {
+            "format": "%(asctime)s [%(processName)s: %(process)d] [%(threadName)s: %(thread)d] [%(levelname)s] %(name)s: %(message)s"
+        },
+    },
+    "handlers": {
+        "default": {
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",  # Default is stderr
+        },
+        "stream_handler": {
+            "formatter": "custom_formatter",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",  # Default is stderr
+        },
+        "file_handler": {
+            "formatter": "custom_formatter",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/app.log",
+            "maxBytes": 1024 * 1024 * 1,  # = 1MB
+            "backupCount": 3,
+        },
+    },
+    "loggers": {
+        "uvicorn": {
+            "handlers": ["default", "file_handler"],
+            "level": "TRACE",
+            "propagate": False,
+        },
+        "uvicorn.access": {
+            "handlers": ["stream_handler", "file_handler"],
+            "level": "TRACE",
+            "propagate": False,
+        },
+        "uvicorn.error": {
+            "handlers": ["stream_handler", "file_handler"],
+            "level": "TRACE",
+            "propagate": False,
+        },
+        "uvicorn.asgi": {
+            "handlers": ["stream_handler", "file_handler"],
+            "level": "TRACE",
+            "propagate": False,
+        },
+    },
+}
 
 
 def parse_cors(v: Any) -> list[str] | str:
@@ -38,9 +91,9 @@ class Settings(BaseSettings):
     FRONTEND_HOST: str = "http://localhost:5173"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
-    BACKEND_CORS_ORIGINS: Annotated[
-        list[AnyUrl] | str, BeforeValidator(parse_cors)
-    ] = []
+    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
+        []
+    )
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -118,3 +171,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore
+logger = logging.getLogger('uvicorn')

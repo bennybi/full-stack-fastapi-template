@@ -1,6 +1,5 @@
 from datetime import timedelta
 from typing import Annotated, Any
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -8,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app import crud
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
-from app.core.config import settings
+from app.core.config import settings, logger
 from app.core.security import get_password_hash
 from app.models import Message, NewPassword, Token, UserPublic
 from app.utils import (
@@ -28,6 +27,7 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
+    logger.info(form_data)  # or logger.debug(), logger.error(), etc.
     user = crud.authenticate(
         session=session, email=form_data.username, password=form_data.password
     )

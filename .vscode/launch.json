@@ -11,6 +11,8 @@
             "module": "uvicorn",
             "args": [
                 "app.main:app",
+                // "--log-level",
+                // "trace",
                 "--reload"
             ],
             "cwd": "${workspaceFolder}/backend",

@@ -4,7 +4,7 @@ from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 from app.api.main import api_router
-from app.core.config import settings
+from app.core.config import settings, LOGGING_CONFIG
 import typer
 
 shell_app = typer.Typer()
@@ -60,6 +60,7 @@ def run(
         factory=True,
         reload=True,
         workers=1,
+        log_config=LOGGING_CONFIG,
     )
 
 
